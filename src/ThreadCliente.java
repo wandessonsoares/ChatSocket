@@ -2,7 +2,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 
 public class ThreadCliente extends Thread{
@@ -40,7 +44,15 @@ public class ThreadCliente extends Thread{
 		}
 		if(comando.contains("all")){
 			String mensagem = comando.substring(9);
-			broadcast(mensagem);
+			
+			String emitente = null;
+			for (User u : Servidor.users) {
+				if(u.getSocket() == socket){
+					emitente = u.getNome();
+				}
+			}
+			
+			broadcast(mensagem, emitente);
 			return "";
 		}
 		else{
@@ -48,15 +60,35 @@ public class ThreadCliente extends Thread{
 		}
 	}
 	
-	public void broadcast(String msg){
+	public void broadcast(String msg, String emitente){
 		for (User u : Servidor.users) {
 			try {
+				String horaFormatada = retornaHora();
+				String dataFormatada = retornaData();
+				
 				DataOutputStream o = new DataOutputStream(u.getSocket().getOutputStream());
-				o.writeUTF(u.getSocket().getInetAddress() + "/~" + u.getNome() + msg);
+				o.writeUTF(socket.getInetAddress() + ":" + socket.getPort() + "/~" + emitente + ":" + msg + " " + horaFormatada + " " + dataFormatada);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public String retornaHora(){
+		Calendar calendar = new GregorianCalendar();
+		SimpleDateFormat hora = new SimpleDateFormat("HH");
+		SimpleDateFormat minuto = new SimpleDateFormat("mm");
+		Date date = new Date();
+		calendar.setTime(date);
+		return hora.format(calendar.getTime()) + "h" + minuto.format(calendar.getTime());
+	}
+	
+	public String retornaData(){
+		Calendar calendar = new GregorianCalendar();
+		SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+		Date date = new Date();
+		calendar.setTime(date);
+		return df.format(calendar.getTime());
 	}
 }
