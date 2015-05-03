@@ -102,8 +102,14 @@ public class ThreadCliente extends Thread{
 		String horaFormatada = retornaHora();
 		
 		try {
-			DataOutputStream o = new DataOutputStream(remetente.getSocket().getOutputStream());
-			o.writeUTF(socket.getInetAddress() + ":" + socket.getPort() + "/~" + emitente + ":" + msg + " " + horaFormatada + " " + dataFormatada);
+			if(remetente == null){
+				DataOutputStream o = new DataOutputStream(socket.getOutputStream());
+				o.writeUTF("Usuário inexistente.");
+			}
+			else{
+				DataOutputStream o = new DataOutputStream(remetente.getSocket().getOutputStream());
+				o.writeUTF(socket.getInetAddress() + ":" + socket.getPort() + "/~" + emitente + ":" + msg + " " + horaFormatada + " " + dataFormatada);
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
