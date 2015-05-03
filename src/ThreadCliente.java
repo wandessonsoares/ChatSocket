@@ -77,6 +77,31 @@ public class ThreadCliente extends Thread{
 			sendTo(remetente, emitente, msg);
 			return("");
 		}
+		else if(comando.contains("rename")){
+			String novonome = comando.substring(7);
+			boolean usado = false;
+			
+			for (User u : Servidor.users) {
+				if(novonome.equals(u.getNome())){
+					usado = true;
+				}
+			}
+			
+			User usuario = null;
+			for (User u : Servidor.users) {
+				if(socket == u.getSocket()){
+					usuario = u;
+				}
+			}
+			
+			if(usado == true){
+				return "Nome de usuário já em uso.";
+			}
+			else{
+				usuario.setNome(novonome);
+				return "Renomeado com sucesso.";
+			}
+		}
 		else{
 			return "comando não reconhecido";
 		}
