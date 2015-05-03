@@ -42,7 +42,7 @@ public class ThreadCliente extends Thread{
 			}
 			return "Usuarios online: " + usuariosOnline;
 		}
-		if(comando.contains("all")){
+		else if(comando.contains("send -all")){
 			String mensagem = comando.substring(9);
 			
 			String emitente = null;
@@ -54,6 +54,28 @@ public class ThreadCliente extends Thread{
 			
 			broadcast(mensagem, emitente);
 			return "";
+		}
+		else if(comando.contains("send -user")){
+			String temp = comando.substring(11);
+			String user = temp.substring(0, temp.indexOf(" "));
+			String msg = temp.substring(temp.indexOf(" "));
+			
+			User remetente = null;
+			for (User u : Servidor.users) {
+				if (u.getNome().equals(user)) {
+					remetente = u;
+				}
+			}
+			
+			String emitente = null;
+			for (User u : Servidor.users) {
+				if (u.getSocket() == socket) {
+					emitente = u.getNome();
+				}
+			}
+			
+			sendTo(remetente, emitente, msg);
+			return("");
 		}
 		else{
 			return "comando não reconhecido";
@@ -72,6 +94,19 @@ public class ThreadCliente extends Thread{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	public void sendTo(User remetente, String emitente, String msg){
+		String dataFormatada = retornaData();
+		String horaFormatada = retornaHora();
+		
+		try {
+			DataOutputStream o = new DataOutputStream(remetente.getSocket().getOutputStream());
+			o.writeUTF(socket.getInetAddress() + ":" + socket.getPort() + "/~" + emitente + ":" + msg + " " + horaFormatada + " " + dataFormatada);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
